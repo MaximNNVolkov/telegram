@@ -1,4 +1,4 @@
-from pyrogram import Client, filters
+from pyrogram import Client
 from decouple import config
 from handlers.handler_message import my_handler
 

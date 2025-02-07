@@ -8,7 +8,7 @@ async def function_replay(client:Client, message: Message):
     if message.text.startswith('Группа'):
         text_split = message.text.split(' ')
         if len(text_split) == 2:
-            await get_group_info(client, text_split[1])
+            await get_group_info(client, text_split[1], message)
         else:
             await get_group_info(client, text_split[1], message, int(text_split[2]))
     elif message.from_user.username == 'MaximVolkov' or message.from_user.username == 'kalentev':

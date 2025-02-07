@@ -51,6 +51,7 @@ async def get_discussion_message(client:Client, msg: Message) -> list:
         comments.append(comment_dict)
     return comments
 
+
 async def get_group_info(client:Client, group_name:str, msg_from: Message, msg_id: int = None):
 
     if msg_id:
