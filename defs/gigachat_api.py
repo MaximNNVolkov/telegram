@@ -3,11 +3,12 @@ from langchain.schema import HumanMessage, SystemMessage
 from langchain_gigachat import GigaChat
 import datetime
 
+
 auth = config('SBER_AUTH')
 
 
 giga = GigaChat(credentials=auth,
-                model='GigaChat:latest',
+                model='GigaChat',
                 verify_ssl_certs=False
                 )
 

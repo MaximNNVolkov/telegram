@@ -8,5 +8,5 @@ class UnsupportedChatType(Exception):
 
     def __str__(self):
         return f'Unsupported chat type: {self.chat_type}. '\
-               f'Supported types: {ChatType.GROUP}, {ChatType.GROUP}. '\
+               f'Supported types: {ChatType.SUPERGROUP}, {ChatType.GROUP}, {ChatType.CHANNEL}. '\
                f'{self.error_message}'

@@ -2,7 +2,7 @@ from pyrogram import Client
 from pyrogram.types import Message
 from pyrogram.enums.chat_type import ChatType
 from pyrogram.raw.functions.messages import GetMessageReactionsList
-from telegram_types.reaction_type import ReactionType, ReactionDetails, ChatDetails
+from telegram_types.base_type import ReactionType, ReactionDetails, ChatDetails
 from telegram_types.error_types import UnsupportedChatType
 
 
@@ -55,22 +55,23 @@ async def get_discussion_message(client:Client, msg: Message) -> list:
     return comments
 
 
-async def get_messages_from_group(client:Client, group_name:str, msg_from: Message, msg_id: int = None):
-
-    print(await get_group_parameters(client, group_name))
-
+async def get_messages_from_group(client:Client, group_name:[str, int], msg_from: Message, msg_id: int = None):
     if msg_id:
         msg = await client.get_messages(chat_id=group_name, message_ids=msg_id)
-        comments = await get_discussion_message(client, msg)
-        if len(comments) == 0:
-            await msg_from.reply(text='К этому сообщению нет комментариев.')
-        else:
-            await msg_from.reply(text=pars_comments(comments))
-        return None
+        # comments = await get_discussion_message(client, msg)
+        # if len(comments) == 0:
+        #     await msg_from.reply(text='К этому сообщению нет комментариев.')
+        # else:
+        #     await msg_from.reply(text=pars_comments(comments))
+        # return None
+        return msg
 
     messages = []
-    # Получаем ID чата по его имени
-    chat = await client.get_chat(group_name)
+    print(group_name)
+    chat = await get_group_parameters(client=client, group_name=group_name)
+    print(chat)
+    topics = await client.get_forum_topic(chat_id=chat.id)
+    print(topics)
     # Используем итератор для получения всех сообщений
     async for message in client.get_chat_history(chat_id=chat.id, offset_id=738, offset=-1, limit=1):
         messages.append(message)
@@ -88,23 +89,6 @@ async def get_messages_from_group(client:Client, group_name:str, msg_from: Messa
     return messages
 
 
-async def get_message_reactions(client:Client, group_name: str, message: Message) -> ReactionType:
-    """
-    Получает все реакции к сообщению.
-    :param client: Клиент подключения к боту
-    :param group_name: Имя группы или канала
-    :param message: Сообщение, к которому нужно получить реакции
-    :return: Реакций ReactionType
-    """
-    peer = await client.resolve_peer(group_name)
-    reacts = await client.invoke(GetMessageReactionsList(peer=peer, id=message.id, limit=10))
-    reaction_details = []
-    for r in reacts.reactions:
-        reaction_details.append(ReactionDetails(user_id = r.peer_id.user_id, emoticon = r.reaction.emoticon, date = r.date))
-    reactions = ReactionType(count=reacts.count, reactions=reaction_details)
-    return reactions
-
-
 async def get_group_parameters(client:Client, group_name:str) -> ChatDetails:
     """
     Получает информацию о группе или канале.
@@ -112,7 +96,6 @@ async def get_group_parameters(client:Client, group_name:str) -> ChatDetails:
     :param group_name: Имя группы или канала
     :return:ChatDetails
     """
-
     chat = await client.get_chat(group_name)
     if chat.type == ChatType.GROUP:
         chat_info = ChatDetails(id=chat.id, type=chat.type, title=chat.title, username=None,
@@ -120,9 +103,9 @@ async def get_group_parameters(client:Client, group_name:str) -> ChatDetails:
     elif chat.type == ChatType.CHANNEL:
         chat_info = ChatDetails(id=chat.id, type=chat.type, title=chat.title, username=chat.username,
                                 invite_link=None, members_count=chat.members_count)
+    elif chat.type == ChatType.SUPERGROUP:
+        chat_info = ChatDetails(id=chat.id, type=chat.type, title=chat.title, username=None,
+                                invite_link=None, members_count=chat.members_count)
     else:
         raise UnsupportedChatType(chat_type=chat.type, error_message='Неизвестный тип чата')
     return chat_info
-
-# search_chats()
-# get_chat_event_log()
