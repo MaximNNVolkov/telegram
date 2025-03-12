@@ -1,5 +1,6 @@
 .idea/
 .gigaide/
+Docs/
 .DS_Store
 .env
 .gitignore
