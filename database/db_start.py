@@ -1,9 +1,9 @@
 import logger as loger
 from sqlalchemy import Column, Integer, String, DateTime, Text
-from sqlalchemy import create_engine, ForeignKey
+from sqlalchemy import create_engine, ForeignKey, func
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, aliased
 from datetime import datetime
 
 
@@ -66,7 +66,6 @@ class ChatDetails(DeclarativeBase):
         """
         Получает категорию чата (chat_category) по его ID.
 
-        :param session: SQLAlchemy session object
         :param chat_id: ID чата
         :return: Категория чата (chat_category) или None, если чат не найден
         """
@@ -107,7 +106,7 @@ class Messages(DeclarativeBase):
             return 'no_new_message'
 
     @classmethod
-    def get_latest_messages_by_category(cls, category: str = '', limit: int = 50):
+    def get_latest_messages_by_category(cls, category: list = [], limit: int = 50):
         """
         Получает последние сообщения из чатов с указанной категорией.
 
@@ -116,18 +115,39 @@ class Messages(DeclarativeBase):
         :param limit: Количество сообщений (по умолчанию 50)
         :return: Список сообщений
         """
-        if category:
-            return (
-                db_conn().query(cls)
-                .join(ChatDetails)  # Присоединяем таблицу chatdetails
-                .filter(ChatDetails.chat_category == category)  # Фильтруем по категории
-                .order_by(cls.message_date) # Сортируем по убыванию даты
-                .limit(limit)  # Ограничиваем количество результатов
-                .all()  # Возвращаем результат в виде списка
+        session = db_conn()
+        if len(category) > 0:
+            subquery = (
+                session.query(
+                cls,
+                func.row_number()
+                .over(partition_by=cls.chat_id, order_by=cls.message_date)
+                .label("row_number")
             )
+             .join(ChatDetails)
+                .filter(ChatDetails.chat_category.in_(category))
+                .subquery())
+
+            # Алиас для подзапроса
+            subquery_alias = aliased(cls, subquery)
+
+            # Основной запрос: выбираем только первые N сообщений для каждой группы
+            return (
+                session.query(subquery_alias)
+                .filter(subquery.c.row_number <= limit)
+                .all()
+            )
+            # return (
+            #     db_conn().query(cls)
+            #     .join(ChatDetails)  # Присоединяем таблицу chatdetails
+            #     .filter(ChatDetails.chat_category.in_(category))  # Фильтруем по категории
+            #     .order_by(cls.message_date) # Сортируем по убыванию даты
+            #     .limit(limit)  # Ограничиваем количество результатов
+            #     .all()  # Возвращаем результат в виде списка
+            # )
         else:
             return (
-                db_conn().query(cls)
+                session.query(cls)
                 .order_by(cls.message_date) # Сортируем по убыванию даты
                 .limit(limit)  # Ограничиваем количество результатов
                 .all()  # Возвращаем результат в виде списка

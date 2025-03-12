@@ -24,8 +24,9 @@ async def get_message_from_channel(client:Client, message: Message) -> Message:
     if category == 'Новости и политика':
         res = await get_messages_group(message)
         log.info(f'Найдены сообщения на эту же тему в истории {res}')
-        if res == 'None':
-            await message.copy(chat_id=-1002460211363)
+        if res == None:
+            caption = message.caption if message.caption else None
+            await message.copy(chat_id=-1002460211363, caption=caption)
     try:
         if message.media:
             res = Messages.add_message(Messages(chat_id = message.chat.id,
@@ -84,16 +85,16 @@ async def get_messages_group(message: Message) -> list:
     """
 
     # Формируем системный промпт с инструкцией
-    sys_prompt = """Найди в истории сообщений все записи с такой же новостью или информацией. 
+    sys_prompt = """сравни семантическое содержание текущего сообщения с историей сообщений из новостных каналов.
+Если в истории есть сообщения схожие с текущим по смыслу нужно вернуть список id этих сообщений.
 Ответ должен содержать ТОЛЬКО JSON-массив с ID этих сообщений. 
-Если дубликатов нет - верни null. Пример: [123, 456]"""
+Если сообщение уникально по смыслу  - верни null."""
 
     # Получаем текст текущего сообщения
     current_text = message.text or message.caption or ""
 
     # Получаем историю сообщений из БД
-    history_messages = Messages.get_latest_messages_by_category(category = 'Новости и политика')
-
+    history_messages = Messages.get_latest_messages_by_category(category = ['Новости и политика'])
     # Формируем данные для API
     sys_message = f"{sys_prompt}\n\nТекущее сообщение для анализа:\n{current_text}"
     user_message = "\n".join(

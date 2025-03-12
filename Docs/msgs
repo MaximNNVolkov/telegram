@@ -1,0 +1,598 @@
+___________________________________________
+message_id 738 2025-02-07 20:52:44
+привет
+👍 - 1, 🔥 - 1
+
+
+реакции из группы:
+{
+    "_": "types.messages.MessageReactionsList",
+    "count": 2,
+    "reactions": [
+        {
+            "_": "types.MessagePeerReaction",
+            "peer_id": {
+                "_": "types.PeerUser",
+                "user_id": 6275871940
+            },
+            "date": 1738951202,
+            "reaction": {
+                "_": "types.ReactionEmoji",
+                "emoticon": "🔥"
+            },
+            "big": false,
+            "unread": false
+        },
+        {
+            "_": "types.MessagePeerReaction",
+            "peer_id": {
+                "_": "types.PeerUser",
+                "user_id": 175431079
+            },
+            "date": 1738950824,
+            "reaction": {
+                "_": "types.ReactionEmoji",
+                "emoticon": "👍"
+            },
+            "big": false,
+            "unread": false
+        }
+    ],
+    "chats": [],
+    "users": [
+        {
+            "_": "types.User",
+            "id": 6275871940,
+            "is_self": true,
+            "contact": true,
+            "mutual_contact": true,
+            "deleted": false,
+            "bot": false,
+            "bot_chat_history": false,
+            "bot_nochats": false,
+            "verified": false,
+            "restricted": false,
+            "min": false,
+            "bot_inline_geo": false,
+            "support": false,
+            "scam": false,
+            "apply_min_photo": true,
+            "fake": false,
+            "bot_attach_menu": false,
+            "premium": false,
+            "attach_menu_enabled": false,
+            "bot_can_edit": false,
+            "access_hash": 920732903955694212,
+            "first_name": "Аноним",
+            "username": "anonim_cod",
+            "phone": "79809543949",
+            "status": {
+                "_": "types.UserStatusOnline",
+                "expires": 1738951753
+            },
+            "restriction_reason": [],
+            "usernames": []
+        },
+        {
+            "_": "types.User",
+            "id": 175431079,
+            "is_self": false,
+            "contact": true,
+            "mutual_contact": true,
+            "deleted": false,
+            "bot": false,
+            "bot_chat_history": false,
+            "bot_nochats": false,
+            "verified": false,
+            "restricted": false,
+            "min": false,
+            "bot_inline_geo": false,
+            "support": false,
+            "scam": false,
+            "apply_min_photo": false,
+            "fake": false,
+            "bot_attach_menu": false,
+            "premium": false,
+            "attach_menu_enabled": false,
+            "bot_can_edit": false,
+            "access_hash": -8627348511312949690,
+            "first_name": "Максим",
+            "last_name": "Волков",
+            "username": "MaximVolkov",
+            "phone": "79877441926",
+            "photo": {
+                "_": "types.UserProfilePhoto",
+                "photo_id": 753470747463231522,
+                "dc_id": 2,
+                "has_video": false,
+                "personal": false,
+                "stripped_thumb": "b'\\x01\\x08\\x087d\\x90a\\xfd\\xdfR\\x7f\\n(\\xa2\\xa52\\xda\\xb1'"
+            },
+            "status": {
+                "_": "types.UserStatusOffline",
+                "was_online": 1738951021
+            },
+            "restriction_reason": [],
+            "usernames": []
+        }
+    ]
+}
+
+__________________________
+Сообщение из группы с темами
+{
+    "_": "Message",
+    "id": 895,
+    "from_user": {
+        "_": "User",
+        "id": 175431079,
+        "is_self": false,
+        "is_contact": true,
+        "is_mutual_contact": true,
+        "is_deleted": false,
+        "is_bot": false,
+        "is_verified": false,
+        "is_restricted": false,
+        "is_scam": false,
+        "is_fake": false,
+        "is_support": false,
+        "is_premium": false,
+        "first_name": "Максим",
+        "last_name": "Волков",
+        "status": "UserStatus.ONLINE",
+        "next_offline_date": "2025-02-12 07:44:21",
+        "username": "MaximVolkov",
+        "dc_id": 2,
+        "phone_number": "*********",
+        "photo": {
+            "_": "ChatPhoto",
+            "small_file_id": "AQADAgADIqgxG6fddAoAEAIAA6fddAoABEZOshU9gEWIAAQeBA",
+            "small_photo_unique_id": "AgADIqgxG6fddAo",
+            "big_file_id": "AQADAgADIqgxG6fddAoAEAMAA6fddAoABEZOshU9gEWIAAQeBA",
+            "big_photo_unique_id": "AgADIqgxG6fddAo"
+        }
+    },
+    "date": "2025-02-12 07:40:39",
+    "chat": {
+        "_": "Chat",
+        "id": 175431079,
+        "type": "ChatType.PRIVATE",
+        "is_verified": false,
+        "is_restricted": false,
+        "is_scam": false,
+        "is_fake": false,
+        "is_support": false,
+        "username": "MaximVolkov",
+        "first_name": "Максим",
+        "last_name": "Волков",
+        "photo": {
+            "_": "ChatPhoto",
+            "small_file_id": "AQADAgADIqgxG6fddAoAEAIAA6fddAoABEZOshU9gEWIAAQeBA",
+            "small_photo_unique_id": "AgADIqgxG6fddAo",
+            "big_file_id": "AQADAgADIqgxG6fddAoAEAMAA6fddAoABEZOshU9gEWIAAQeBA",
+            "big_photo_unique_id": "AgADIqgxG6fddAo"
+        },
+        "dc_id": 2
+    },
+    "forward_from": {
+        "_": "User",
+        "id": 175431079,
+        "is_self": false,
+        "is_contact": true,
+        "is_mutual_contact": true,
+        "is_deleted": false,
+        "is_bot": false,
+        "is_verified": false,
+        "is_restricted": false,
+        "is_scam": false,
+        "is_fake": false,
+        "is_support": false,
+        "is_premium": false,
+        "first_name": "Максим",
+        "last_name": "Волков",
+        "status": "UserStatus.ONLINE",
+        "next_offline_date": "2025-02-12 07:44:21",
+        "username": "MaximVolkov",
+        "dc_id": 2,
+        "phone_number": "*********",
+        "photo": {
+            "_": "ChatPhoto",
+            "small_file_id": "AQADAgADIqgxG6fddAoAEAIAA6fddAoABEZOshU9gEWIAAQeBA",
+            "small_photo_unique_id": "AgADIqgxG6fddAo",
+            "big_file_id": "AQADAgADIqgxG6fddAoAEAMAA6fddAoABEZOshU9gEWIAAQeBA",
+            "big_photo_unique_id": "AgADIqgxG6fddAo"
+        }
+    },
+    "forward_date": "2025-02-09 15:03:39",
+    "mentioned": false,
+    "scheduled": false,
+    "from_scheduled": false,
+    "has_protected_content": false,
+    "text": "Ну и наконец нам нужно бизнес анализ",
+    "outgoing": false
+}
+
+{
+    "_": "types.messages.ForumTopics",
+    "count": 14,
+    "topics": [
+        {
+            "_": "types.ForumTopic",
+            "id": 16780,
+            "date": 1693491420,
+            "title": "Новости канала",
+            "icon_color": 16749490,
+            "top_message": 44746,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 44746,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerUser",
+                "user_id": 606937816
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": true,
+            "short": false,
+            "hidden": false,
+            "icon_emoji_id": 5370870893004203704
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 15923,
+            "date": 1692444167,
+            "title": "Регистрация партнеров🔑",
+            "icon_color": 16749490,
+            "top_message": 45653,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 45652,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerChannel",
+                "channel_id": 1702618803
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 15924,
+            "date": 1692444213,
+            "title": "Взаиморасчеты и выплаты💰",
+            "icon_color": 9367192,
+            "top_message": 45650,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 45651,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerChannel",
+                "channel_id": 1702618803
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 15922,
+            "date": 1692444021,
+            "title": "Аналитика и отчетность📊",
+            "icon_color": 16478047,
+            "top_message": 45647,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 45647,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerChannel",
+                "channel_id": 1702618803
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 1,
+            "date": 1640585438,
+            "title": "General",
+            "icon_color": 7322096,
+            "top_message": 45643,
+            "read_inbox_max_id": 45549,
+            "read_outbox_max_id": 45643,
+            "unread_count": 1,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerChannel",
+                "channel_id": 1702618803
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 24198,
+            "date": 1705558199,
+            "title": "Закрепление партнёров за МПП",
+            "icon_color": 9367192,
+            "top_message": 45642,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 45642,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerUser",
+                "user_id": 163599013
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 28904,
+            "date": 1711346393,
+            "title": "Вопросы по работе ЛК МПП",
+            "icon_color": 13338331,
+            "top_message": 45634,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 45634,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerUser",
+                "user_id": 163599013
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false,
+            "icon_emoji_id": 5409357944619802453
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 15920,
+            "date": 1692443898,
+            "title": "Продуктовые вопросы🛒",
+            "icon_color": 7322096,
+            "top_message": 45632,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 45632,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerChannel",
+                "channel_id": 1702618803
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 15921,
+            "date": 1692443944,
+            "title": "Массовые инциденты😬⚡️",
+            "icon_color": 7322096,
+            "top_message": 45622,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 45622,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerChannel",
+                "channel_id": 1702618803
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 15954,
+            "date": 1692599020,
+            "title": "Материалы и документы",
+            "icon_color": 16766590,
+            "top_message": 45433,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 45433,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerChannel",
+                "channel_id": 1702618803
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 16445,
+            "date": 1692958660,
+            "title": "Предложения по доработкам платформы",
+            "icon_color": 9367192,
+            "top_message": 45247,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 45247,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerUser",
+                "user_id": 163599013
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 20262,
+            "date": 1699433768,
+            "title": "Обучение🧑🏻‍🎓📚",
+            "icon_color": 16749490,
+            "top_message": 45174,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 45174,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerChannel",
+                "channel_id": 1702618803
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 39758,
+            "date": 1728631257,
+            "title": "Конкурс для МПП 4Q",
+            "icon_color": 7322096,
+            "top_message": 44048,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 44048,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerUser",
+                "user_id": 227160250
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false,
+            "icon_emoji_id": 5312016608254762256
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 21646,
+            "date": 1701767614,
+            "title": "Сегментация и воронки 🌪️",
+            "icon_color": 7322096,
+            "top_message": 40120,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 40120,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerChannel",
+                "channel_id": 1702618803
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false
+        },
+        {
+            "_": "types.ForumTopic",
+            "id": 34128,
+            "date": 1720431353,
+            "title": "Лучшие практики",
+            "icon_color": 16749490,
+            "top_message": 34128,
+            "read_inbox_max_id": 0,
+            "read_outbox_max_id": 34129,
+            "unread_count": 0,
+            "unread_mentions_count": 0,
+            "unread_reactions_count": 0,
+            "from_id": {
+                "_": "types.PeerUser",
+                "user_id": 1178505553
+            },
+            "notify_settings": {
+                "_": "types.PeerNotifySettings"
+            },
+            "my": false,
+            "closed": false,
+            "pinned": false,
+            "short": false,
+            "hidden": false,
+            "icon_emoji_id": 5312241539987020022
+        }
+    ],
