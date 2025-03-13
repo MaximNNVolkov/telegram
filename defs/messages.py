@@ -1,11 +1,10 @@
 from pyrogram import Client
-from pyrogram.types import Message, MessageEntity
+from pyrogram.types import Message, InputMediaPhoto, InputMediaVideo
 from pyrogram.raw.functions.messages import GetMessageReactionsList
 from telegram_types.base_type import ReactionType, ReactionDetails, ChatDetails
 from defs.deepseek_api import get_response
 from database.db_start import Messages, ChatDetails
 import logger
-import json
 
 
 log = logger.get_logger(__name__)
@@ -24,9 +23,30 @@ async def get_message_from_channel(client:Client, message: Message) -> Message:
     if category == 'Новости и политика':
         res = await get_messages_group(message)
         log.info(f'Найдены сообщения на эту же тему в истории {res}')
-        if res == None:
-            caption = message.caption if message.caption else None
-            await message.copy(chat_id=-1002460211363, caption=caption)
+        if res == 'null':
+            if message.media_group_id:
+                # Получаем всю медиагруппу
+                media_group = await client.get_media_group(message.chat.id, message.id)
+
+                # Подготавливаем медиафайлы для пересылки
+                media_list = []
+                for media in media_group:
+                    if media.photo:
+                        # Если это фото
+                        media_list.append(
+                            InputMediaPhoto(media.photo.file_id, caption=media.caption)
+                        )
+                    elif media.video:
+                        # Если это видео
+                        media_list.append(
+                            InputMediaVideo(media.video.file_id, caption=media.caption)
+                        )
+
+                # Пересылаем медиагруппу в чат с id -1002460211363
+                await client.send_media_group(chat_id=-1002460211363, media=media_list)
+            else:
+                caption = message.caption if message.caption else None
+                await message.copy(chat_id=-1002460211363, caption=caption)
     try:
         if message.media:
             res = Messages.add_message(Messages(chat_id = message.chat.id,
@@ -79,7 +99,6 @@ def get_message_topic(text: str) -> str:
 async def get_messages_group(message: Message) -> list:
     """
     Находит дубликаты сообщения из групп с одной темой и возвращает их.
-    :param client: Клиент подключения к боту
     :param message: Сообщение из группы или канала из которого нужно получить комментарии
     :return: Сообщения из группы или канала
     """
@@ -98,7 +117,7 @@ async def get_messages_group(message: Message) -> list:
     # Формируем данные для API
     sys_message = f"{sys_prompt}\n\nТекущее сообщение для анализа:\n{current_text}"
     user_message = "\n".join(
-        [str((x.message_id, x.message_text)) for x in history_messages]
+        ['|'.join([str(x.message_id), str(x.message_text)]) for x in history_messages]
     )
 
     # Отправляем запрос в deepseek_api
@@ -106,12 +125,4 @@ async def get_messages_group(message: Message) -> list:
         sys_message=sys_message,
         user_message=user_message
     )
-
-    # Парсим результат
-    try:
-        result = json.loads(api_response)
-        if isinstance(result, list) and all(isinstance(i, int) for i in result):
-            return result
-        return None
-    except (json.JSONDecodeError, TypeError):
-        return None
+    return api_response.choices[0].message.content

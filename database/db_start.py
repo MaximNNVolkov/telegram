@@ -1,6 +1,6 @@
 import logger as loger
 from sqlalchemy import Column, Integer, String, DateTime, Text
-from sqlalchemy import create_engine, ForeignKey, func
+from sqlalchemy import create_engine, ForeignKey, func, desc
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, aliased
@@ -106,11 +106,10 @@ class Messages(DeclarativeBase):
             return 'no_new_message'
 
     @classmethod
-    def get_latest_messages_by_category(cls, category: list = [], limit: int = 50):
+    def get_latest_messages_by_category(cls, category: list = [], limit: int = 5):
         """
         Получает последние сообщения из чатов с указанной категорией.
 
-        :param session: SQLAlchemy session object
         :param category: Категория чата (например, 'Новости и политика')
         :param limit: Количество сообщений (по умолчанию 50)
         :return: Список сообщений
@@ -121,7 +120,7 @@ class Messages(DeclarativeBase):
                 session.query(
                 cls,
                 func.row_number()
-                .over(partition_by=cls.chat_id, order_by=cls.message_date)
+                .over(partition_by=cls.chat_id, order_by=desc(cls.message_date))
                 .label("row_number")
             )
              .join(ChatDetails)
