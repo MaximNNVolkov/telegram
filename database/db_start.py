@@ -62,7 +62,7 @@ class ChatDetails(DeclarativeBase):
     chat_term = Column(Text, nullable=True)
 
     @classmethod
-    def get_chat_category_by_id(cls, chat_id: str) -> str:
+    def get_chat_category_by_id(cls, chat_id: str) -> str or None:
         """
         Получает категорию чата (chat_category) по его ID.
 
@@ -106,7 +106,7 @@ class Messages(DeclarativeBase):
             return 'no_new_message'
 
     @classmethod
-    def get_latest_messages_by_category(cls, category: list = [], limit: int = 5):
+    def get_latest_messages_by_category(cls, category: list = None, limit: int = 5):
         """
         Получает последние сообщения из чатов с указанной категорией.
 
@@ -115,7 +115,7 @@ class Messages(DeclarativeBase):
         :return: Список сообщений
         """
         session = db_conn()
-        if len(category) > 0:
+        if not category:
             subquery = (
                 session.query(
                 cls,
@@ -151,6 +151,55 @@ class Messages(DeclarativeBase):
                 .limit(limit)  # Ограничиваем количество результатов
                 .all()  # Возвращаем результат в виде списка
             )
+
+
+class SentMessages(DeclarativeBase):
+    __tablename__ = 'sent_messages'
+
+    date = Column(DateTime(), default=datetime.now)
+    channel_id = Column(String, ForeignKey('chatdetails.id'), primary_key=True)  # Идентификатор канала в который
+    sent_message_id = Column(Integer, primary_key=True)  # Идентификатор отправленного сообщения
+    message_type = Column(String)
+    message_text = Column(Text)
+    message_topic = Column(String)
+    message_date = Column(DateTime())
+
+    @classmethod
+    def add_sent_message(cls, sent_message) -> str:
+        log.info(
+            f'Запрос на добавление нового отправленного сообщения для пользователя '
+            f'{sent_message.user_id}, {sent_message.sent_message_id}, {sent_message.message_type}, '
+            f'{sent_message.message_text}, {sent_message.message_topic}, {sent_message.message_date}')
+
+        conn = db_conn()
+        existing_message = conn.query(cls).filter(cls.sent_message_id == sent_message.sent_message_id).first()
+        if existing_message is None:
+            m = sent_message
+            conn.add(m)
+            conn.commit()
+            log.info(f'Сообщение с id {sent_message.sent_message_id} для пользователя {sent_message.user_id} успешно добавлено.')
+            return 'success'
+        else:
+            log.info(f'Сообщение с id {sent_message.sent_message_id} уже существует.')
+            return 'no_new_message'
+
+    @classmethod
+    def get_latest_sent_messages_by_user(cls, user_id: str, limit: int = 5):
+        """
+        Получает последние сообщения, отправленные конкретному пользователю.
+
+        :param user_id: Идентификатор пользователя
+        :param limit: Количество сообщений (по умолчанию 5)
+        :return: Список сообщений
+        """
+        session = db_conn()
+        return (
+            session.query(cls)
+            .filter(cls.user_id == user_id)
+            .order_by(desc(cls.message_date))
+            .limit(limit)
+            .all()
+        )
 
 
 def db_conn():
