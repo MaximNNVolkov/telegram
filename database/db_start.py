@@ -136,14 +136,6 @@ class Messages(DeclarativeBase):
                 .filter(subquery.c.row_number <= limit)
                 .all()
             )
-            # return (
-            #     db_conn().query(cls)
-            #     .join(ChatDetails)  # Присоединяем таблицу chatdetails
-            #     .filter(ChatDetails.chat_category.in_(category))  # Фильтруем по категории
-            #     .order_by(cls.message_date) # Сортируем по убыванию даты
-            #     .limit(limit)  # Ограничиваем количество результатов
-            #     .all()  # Возвращаем результат в виде списка
-            # )
         else:
             return (
                 session.query(cls)
@@ -168,7 +160,7 @@ class SentMessages(DeclarativeBase):
     def add_sent_message(cls, sent_message) -> str:
         log.info(
             f'Запрос на добавление нового отправленного сообщения для пользователя '
-            f'{sent_message.user_id}, {sent_message.sent_message_id}, {sent_message.message_type}, '
+            f'{sent_message.channel_id}, {sent_message.sent_message_id}, {sent_message.message_type}, '
             f'{sent_message.message_text}, {sent_message.message_topic}, {sent_message.message_date}')
 
         conn = db_conn()
@@ -177,29 +169,29 @@ class SentMessages(DeclarativeBase):
             m = sent_message
             conn.add(m)
             conn.commit()
-            log.info(f'Сообщение с id {sent_message.sent_message_id} для пользователя {sent_message.user_id} успешно добавлено.')
+            log.info(f'Сообщение с id {sent_message.sent_message_id} для пользователя {sent_message.channel_id} успешно добавлено.')
             return 'success'
         else:
             log.info(f'Сообщение с id {sent_message.sent_message_id} уже существует.')
             return 'no_new_message'
 
     @classmethod
-    def get_latest_sent_messages_by_user(cls, user_id: str, limit: int = 5):
+    def get_latest_sent_messages_by_user(cls, user_id: str, limit: int = 30):
         """
         Получает последние сообщения, отправленные конкретному пользователю.
 
         :param user_id: Идентификатор пользователя
-        :param limit: Количество сообщений (по умолчанию 5)
+        :param limit: Количество сообщений (по умолчанию 30)
         :return: Список сообщений
         """
-        session = db_conn()
-        return (
-            session.query(cls)
-            .filter(cls.user_id == user_id)
-            .order_by(desc(cls.message_date))
-            .limit(limit)
-            .all()
-        )
+        with db_conn() as session:
+            return (
+                session.query(cls)
+                .filter(cls.channel_id == user_id)
+                .order_by(desc(cls.message_date))
+                .limit(limit)
+                .all()
+            )
 
 
 def db_conn():

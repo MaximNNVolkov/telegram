@@ -5,7 +5,7 @@ _log_format = f"%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(func
 
 
 def get_file_handler(level):
-    file_handler = logging.FileHandler("tinkoff_helper.loger")
+    file_handler = logging.FileHandler("telegram.loger")
     file_handler.setLevel(level)
     file_handler.setFormatter(logging.Formatter(_log_format))
     return file_handler
