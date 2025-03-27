@@ -4,9 +4,12 @@ from pyrogram.types import Message
 from pyrogram.enums import MessageEntityType
 from pyrogram.raw.types import ForumTopic, Chat
 from pyrogram.errors import NotAcceptable
+
 import logger
+
 from defs.gigachat_api import giga, HumanMessage, SystemMessage
 from defs.deepseek_api import get_response
+
 from database.defs_base import add_chat_details
 from database.db_start import ChatDetails
 from database.defs_base import get_chat_details
@@ -60,7 +63,7 @@ async def chat_link(client:Client, message: Message):
             if entity.type in [MessageEntityType.URL, MessageEntityType.MENTION]:
                 entity_text = message.text[entity.offset:entity.offset+entity.length]
                 chat = await get_chat(client=client).get_chat(entity_text)
-            log.debug(f'chat_id parsed from link: {chat.id}')
+                log.debug(f'chat_id parsed from link: {chat.id}')
 
             if get_chat_details(chat.id) != 'no_chat_details':
                 log.info(f'chat {chat.id} details already exists')
