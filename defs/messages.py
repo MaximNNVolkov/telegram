@@ -1,9 +1,12 @@
 from pyrogram import Client
 from pyrogram.types import Message, InputMediaPhoto, InputMediaVideo
 from pyrogram.raw.functions.messages import GetMessageReactionsList
+
+from defs.channels_processor.channels import ChannelsProcessor
 from telegram_types.base_type import ReactionType, ReactionDetails
 from defs.deepseek_api import get_response
-from database.db_start import Messages, ChatDetails, SentMessages
+from defs.methods.message_sender import MessageSender
+from database.db_start import Messages, ChatDetails, SentMessages, Channels
 import logger
 
 
@@ -20,6 +23,7 @@ class MessageFormChannel:
         :return: Сообщение из канала
         """
         topic = TopicHandler.get_message_topic(message.text or message.caption)
+        MessageSaveHandler.save_message_to_db(message, topic)
         category = ChatDetails.get_chat_category_by_id(str(message.chat.id))
         log.info(f'Поступило сообщение из категории {category}')
         if category == 'Новости и политика':
@@ -28,7 +32,9 @@ class MessageFormChannel:
             if res == 'null':
                 sent_message = await MessageSender.send_message(client=client, chat_id=-1002460211363, message=message)
                 SaveSentMessageHandler.save_sent_message(sent_message, topic=topic)
-        MessageSaveHandler.save_message_to_db(message, topic)
+        channels = Channels.get_channel_by_user_id(-1002560213613).sources
+        if message.chat.id in channels:
+            await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
         return None
 
     @staticmethod
@@ -40,16 +46,19 @@ class MessageFormChannel:
         :return: Сообщение из канала
         """
         topic = TopicHandler.get_message_topic(message.text or message.caption)
+        MessageSaveHandler.save_message_to_db(message, topic)
+
         category = ChatDetails.get_chat_category_by_id(str(message.chat.id))
         log.info(f'Поступило сообщение из категории {category}')
         if category == 'Новости и политика':
             res = await GroupHandler.get_messages_group(message, chat_id=str(-1002460211363))
             log.info(f'Найдены сообщения на эту же тему в истории {res}')
             if res == 'null':
-                sent_message = await MediaGroupSender.send_media(client=client, chat_id=-1002460211363, message=message)
-                SaveSentMessageHandler.save_sent_message(sent_message[0], topic)
-        MessageSaveHandler.save_message_to_db(message, topic)
-
+                sent_messages = await MediaGroupSender.send_media(client=client, chat_id=-1002460211363, message=message)
+                SaveSentMessageHandler.save_sent_message(sent_messages, topic)
+        channels = Channels.get_channel_by_user_id(-1002560213613).sources
+        if message.chat.id in channels:
+            await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
         return None
 
 
@@ -80,35 +89,9 @@ class MessageSaveHandler:
         return res
 
 
-class MessageSender:
-    @staticmethod
-    async def send_message(client: Client, chat_id: int, message: Message) -> Message:
-        """
-        Отправляет сообщение в чат.
-        :param client: Клиент подключения к боту
-        :param chat_id: ID чата куда нужно отправить
-        :param message: Сообщение для отправки в чат
-        :return: Результат отправки сообщения в чат
-        """
-        caption = message.caption if message.caption else None
-        if not caption:
-            res = await message.copy(chat_id, caption=caption)
-            log.info(f'message sent to chat result: {res.id}')
-            return res
-        if len(caption) > 1024:
-            res = await message.copy(chat_id, caption=caption[0:1024])
-            for i in range(1024, len(caption), 1024):
-                if i<len(caption):
-                    res = await client.send_message(chat_id=chat_id, text=caption[i:i+1024])
-        else:
-            res = await message.copy(chat_id, caption=caption)
-        log.info(f'message sent to chat result: {res.id}')
-        return res
-
-
 class MediaGroupSender:
     @staticmethod
-    async def send_media(client: Client, chat_id: int, message: Message) -> list[Message]:
+    async def send_media(client: Client, chat_id: int, message: Message) -> list[Message] or None:
         """
         Отправляет медиа группу в чат.
         :param client: Клиент подключения к боту
@@ -136,9 +119,21 @@ class MediaGroupSender:
         log.info(f'media list: {media_list}')
 
         # Пересылаем медиа-группу в чат с id chat_id
-        res = await client.send_media_group(chat_id=chat_id, media=media_list)
-        log.info(f'media group sent to chat result: {res[0].id}')
-        return res
+        try:
+            res = await client.send_media_group(chat_id=chat_id, media=media_list)
+
+            # Проверяем, что результат является списком и не пуст
+            if isinstance(res, list) and res:
+                message_ids = [msg.id for msg in res]
+                log.info(f'Media group sent. Message IDs: {message_ids}')
+                return res
+            else:
+                log.error('Unexpected response format from send_media_group')
+                return None
+
+        except Exception as e:
+            log.error(f'Failed to send media group: {str(e)}')
+            return None
 
 
 class ReactionHandler:
@@ -156,7 +151,7 @@ class ReactionHandler:
         reaction_details = []
         for r in reacts.reactions:
             reaction_details.append(ReactionDetails(user_id = r.peer_id.user_id, emoticon = r.reaction.emoticon, date = r.date))
-        reactions = ReactionType(count=reacts.count, reactions=reaction_details)
+        reactions = ReactionType.create(count=reacts.count, reactions=reaction_details)
         return reactions
 
 
@@ -166,7 +161,6 @@ class TopicHandler:
         """Получает название темы из сообщения."""
         sys_msg = '''определи тему сообщения, тема должна отражать суть сообщения. ответ должен содержать 
 только название темы без кавычек и знаков препинания. Если сообщение пустое - верни null'''
-        res = ''
         try:
             res = get_response(sys_message=sys_msg, user_message=text)
             return res.choices[0].message.content
@@ -188,16 +182,15 @@ class GroupHandler:
         # Формируем системный prompt с инструкцией
         sys_prompt = """сравни семантическое содержание текущего сообщения с историей сообщений из новостных каналов.
 Если в истории есть сообщения схожие с текущим по смыслу нужно вернуть список id этих сообщений.
+Ответ должен содержать ТОЛЬКО массив с ID этих сообщений, пример: [1234,2432,3765]. 
+Если сообщение уникально по смыслу верни null.
 Истории сообщений будет передан в виде массива сообщений в следующем формате: channel_id|message_id|message_text.
-Ответ должен содержать ТОЛЬКО массив с ID этих сообщений. 
-Если сообщение уникально по смыслу  - верни null.
 """
 
         # Получаем текст текущего сообщения
         current_text = message.text or message.caption or ""
 
         # Получаем историю сообщений из БД
-        # history_messages = Messages.get_latest_messages_by_category(category = ['Новости и политика'])
         history_messages = SentMessages.get_latest_sent_messages_by_user(user_id=chat_id)
         # Формируем данные для API
         sys_message = f"{sys_prompt}\n\nТекущее сообщение для анализа:\n{current_text}"
@@ -214,14 +207,18 @@ class GroupHandler:
 
 
 class SaveSentMessageHandler:
+
     @staticmethod
-    def save_sent_message(message: Message, topic):
+    def save_sent_message(message: Message, topic: str = ''):
         """
         Сохраняет сообщение в БД.
         :param message: Сообщение для сохранения
         :param topic: Тема сообщения
         :return: Результат сохранения сообщения
         """
+        if isinstance(message, list):
+            print(message)
+            message = message[0]
         res = SentMessages.add_sent_message(
             SentMessages(channel_id = str(message.chat.id),
                          sent_message_id = message.id,
@@ -229,3 +226,4 @@ class SaveSentMessageHandler:
                          message_text = message.caption or message.text,
                          message_topic = topic or '',
                          message_date = message.date))
+        return res

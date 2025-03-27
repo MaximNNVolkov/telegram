@@ -6,7 +6,7 @@ auth_deepseek = config('DEEPSEEK_API2')
 client = OpenAI(api_key=auth_deepseek, base_url="https://api.deepseek.com")
 
 
-def get_response(sys_message, user_message):
+def get_response(user_message: str, sys_message: str = ''):
     response = client.chat.completions.create(
         model="deepseek-chat",
         messages=[

@@ -10,4 +10,5 @@ async def raw_messages(client:Client, message: Message):
     # if message.from_user.username == 'MaximVolkov' or message.from_user.username == 'kalentev':
     #     await message.reply(gigachat_dialog(message.text))
     # else:
-    log.info(f"поступило необработанное сообщение message = '''{message.chat.id}, {message.chat.title}, {message.from_user.id}, {message.text}'''")
+    log.info(f"поступило необработанное сообщение message = \
+{message.chat.id}, {message.chat.title}, {message.text}")
