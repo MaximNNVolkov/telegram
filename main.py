@@ -1,4 +1,5 @@
 from pyrogram import Client
+from pyrogram.enums import ParseMode
 from decouple import config
 from handlers.handler_message import (add_chat_by_link, add_chat_by_name, get_chat_by_id, search_channels,
                                       parse_media, parse_messages, other_message)
@@ -12,7 +13,8 @@ log = logger.get_logger(__name__)
 bot = Client(name=config('LOGIN'),
              api_id=config('API_ID'),
              api_hash=config('API_HASH'),
-             phone_number=config('PHONE'))
+             phone_number=config('PHONE'),
+             parse_mode=ParseMode.MARKDOWN) #todo: убрать, если не нужно
 
 
 bot.add_handler(add_chat_by_link)

@@ -2,10 +2,10 @@ from pyrogram import Client
 from pyrogram.types import Message
 
 from defs.methods.message_sender import MessageSender
+from defs.methods.save_sent_message import SaveSentMessageHandler
+
 from defs.deepseek_api import get_response
 from database.db_start import Channels
-from defs.filters.messages import Filters
-from telegram_types.base_type import MessageBlockType
 import logger
 
 
@@ -23,21 +23,17 @@ class ChannelsProcessor:
         :param message - pyrogram message
         :return: None
         """
-        log.info(f'message from channels from channel: {message.chat.title}')
+
+        log.info(f'message from channel: {message.chat.title}')
         message_text = message.text if message.text else message.caption
         if message_text:
-
-            message_blocked_type = Filters(text=message_text).apply_filters()
-            if message_blocked_type != MessageBlockType.NORMAL:
-                log.warning(f"""filtered message: {message.chat.id}, {message.id} is blocked/
-                 message blocked type: {message_blocked_type}.""")
-                return None
-
             mkw = MatchKeyWords(keywords=Channels().get_channel_keywords(channel_id=self.channel_id),
                                 message=message_text)
-
             if mkw.response_match() == 'Да':
-                await MessageSender().send_message(client=client, chat_id=self.channel_id, message=message)
+                sent_message = await MessageSender().send_message(client=client, chat_id=self.channel_id, message=message)
+                if sent_message:
+                    topic = ''
+                    SaveSentMessageHandler.save_sent_message(sent_message, topic=topic)
 
 
 

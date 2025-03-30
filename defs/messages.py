@@ -2,10 +2,14 @@ from pyrogram import Client
 from pyrogram.types import Message, InputMediaPhoto, InputMediaVideo
 from pyrogram.raw.functions.messages import GetMessageReactionsList
 
-from defs.channels_processor.channels import ChannelsProcessor
 from telegram_types.base_type import ReactionType, ReactionDetails
+
+from defs.channels_processor.channels import ChannelsProcessor
 from defs.deepseek_api import get_response
 from defs.methods.message_sender import MessageSender
+from defs.methods.save_sent_message import SaveSentMessageHandler
+from defs.methods.links.message_link import MessageLink
+
 from database.db_start import Messages, ChatDetails, SentMessages, Channels
 import logger
 
@@ -14,6 +18,7 @@ log = logger.get_logger(__name__)
 
 
 class MessageFormChannel:
+
     @staticmethod
     async def get_message_from_channel(client: Client, message: Message) -> None:
         """
@@ -22,16 +27,24 @@ class MessageFormChannel:
         :param message: Сообщение из группы или канала из которого нужно получить комментарии
         :return: Сообщение из канала
         """
+
+        print(await MessageLink().get_link(client=client,
+                                     id_message=message.id,
+                                     id_channel=message.chat.id))
+
         topic = TopicHandler.get_message_topic(message.text or message.caption)
         MessageSaveHandler.save_message_to_db(message, topic)
+
         category = ChatDetails.get_chat_category_by_id(str(message.chat.id))
         log.info(f'Поступило сообщение из категории {category}')
+
         if category == 'Новости и политика':
             res = await GroupHandler.get_messages_group(message, chat_id=str(-1002460211363))
             log.info(f'Найдены сообщения на эту же тему в истории {res}')
             if res == 'null':
                 sent_message = await MessageSender.send_message(client=client, chat_id=-1002460211363, message=message)
-                SaveSentMessageHandler.save_sent_message(sent_message, topic=topic)
+                if sent_message:
+                    SaveSentMessageHandler.save_sent_message(sent_message, topic=topic)
         channels = Channels.get_channel_by_user_id(-1002560213613).sources
         if message.chat.id in channels:
             await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
@@ -45,20 +58,24 @@ class MessageFormChannel:
         :param message: Сообщение из группы или канала из которого нужно получить комментарии
         :return: Сообщение из канала
         """
-        topic = TopicHandler.get_message_topic(message.text or message.caption)
-        MessageSaveHandler.save_message_to_db(message, topic)
 
-        category = ChatDetails.get_chat_category_by_id(str(message.chat.id))
-        log.info(f'Поступило сообщение из категории {category}')
-        if category == 'Новости и политика':
-            res = await GroupHandler.get_messages_group(message, chat_id=str(-1002460211363))
-            log.info(f'Найдены сообщения на эту же тему в истории {res}')
-            if res == 'null':
-                sent_messages = await MediaGroupSender.send_media(client=client, chat_id=-1002460211363, message=message)
-                SaveSentMessageHandler.save_sent_message(sent_messages, topic)
-        channels = Channels.get_channel_by_user_id(-1002560213613).sources
-        if message.chat.id in channels:
-            await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
+        if message.caption:
+            topic = TopicHandler.get_message_topic(message.caption)
+            MessageSaveHandler.save_message_to_db(message, topic)
+
+            category = ChatDetails.get_chat_category_by_id(str(message.chat.id))
+            log.info(f'Поступило сообщение из категории {category}')
+
+            if category == 'Новости и политика':
+                res = await GroupHandler.get_messages_group(message, chat_id=str(-1002460211363))
+                log.info(f'Найдены сообщения на эту же тему в истории {res}')
+                if res == 'null':
+                    sent_messages = await MediaGroupSender.send_media(client=client, chat_id=-1002460211363, message=message)
+                    SaveSentMessageHandler.save_sent_message(sent_messages, topic)
+
+            channels = Channels.get_channel_by_user_id(-1002560213613).sources
+            if message.chat.id in channels:
+                await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
         return None
 
 
@@ -102,8 +119,6 @@ class MediaGroupSender:
         # Получаем всю медиа-группу
         media_group = await client.get_media_group(message.chat.id, message.id)
         # Подготавливаем медиафайлы для пересылки
-        if not message.caption:
-            return []
         media_list = []
         for media in media_group:
             if media.photo:
@@ -182,8 +197,8 @@ class GroupHandler:
         # Формируем системный prompt с инструкцией
         sys_prompt = """сравни семантическое содержание текущего сообщения с историей сообщений из новостных каналов.
 Если в истории есть сообщения схожие с текущим по смыслу нужно вернуть список id этих сообщений.
-Ответ должен содержать ТОЛЬКО массив с ID этих сообщений, пример: [1234,2432,3765]. 
-Если сообщение уникально по смыслу верни null.
+Ответ должен содержать ТОЛЬКО массив с message_id этих сообщений. 
+Если сообщение уникально по смыслу верни ТОЛЬКО null.
 Истории сообщений будет передан в виде массива сообщений в следующем формате: channel_id|message_id|message_text.
 """
 
@@ -204,26 +219,3 @@ class GroupHandler:
             user_message=user_message
         )
         return api_response.choices[0].message.content
-
-
-class SaveSentMessageHandler:
-
-    @staticmethod
-    def save_sent_message(message: Message, topic: str = ''):
-        """
-        Сохраняет сообщение в БД.
-        :param message: Сообщение для сохранения
-        :param topic: Тема сообщения
-        :return: Результат сохранения сообщения
-        """
-        if isinstance(message, list):
-            print(message)
-            message = message[0]
-        res = SentMessages.add_sent_message(
-            SentMessages(channel_id = str(message.chat.id),
-                         sent_message_id = message.id,
-                         message_type = str(message.media).split('.')[1] if message.media else 'TEXT',
-                         message_text = message.caption or message.text,
-                         message_topic = topic or '',
-                         message_date = message.date))
-        return res
