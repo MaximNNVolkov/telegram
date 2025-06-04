@@ -28,10 +28,6 @@ class MessageFormChannel:
         :return: Сообщение из канала
         """
 
-        print(await MessageLink().get_link(client=client,
-                                     id_message=message.id,
-                                     id_channel=message.chat.id))
-
         topic = TopicHandler.get_message_topic(message.text or message.caption)
         MessageSaveHandler.save_message_to_db(message, topic)
 
