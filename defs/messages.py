@@ -167,16 +167,38 @@ class ReactionHandler:
 
 
 class TopicHandler:
+#     @staticmethod
+#     def get_message_topic(text: str) -> str or None:
+#         """Получает название темы из сообщения."""
+#         sys_msg = '''определи тему сообщения, тема должна отражать суть сообщения. ответ должен содержать 
+# только название темы без кавычек и знаков препинания. Если сообщение пустое - верни null'''
+#         try:
+#             res = get_response(sys_message=sys_msg, user_message=text)
+#             return res.choices[0].message.content
+#         except Exception as e:
+#             log.error(e)
+#             return None
+
     @staticmethod
-    def get_message_topic(text: str) -> str or None:
+    def get_message_topic(text: str | None) -> str | None:
         """Получает название темы из сообщения."""
-        sys_msg = '''определи тему сообщения, тема должна отражать суть сообщения. ответ должен содержать 
-только название темы без кавычек и знаков препинания. Если сообщение пустое - верни null'''
+        if text is None or not str(text).strip():
+            return None
+
+        sys_msg = (
+            "определи тему сообщения, тема должна отражать суть сообщения. "
+            "ответ должен содержать только название темы без кавычек и знаков препинания. "
+            "Если сообщение пустое - верни null"
+        )
         try:
-            res = get_response(sys_message=sys_msg, user_message=text)
-            return res.choices[0].message.content
+            res = get_response(sys_message=sys_msg, user_message=str(text).strip())
+            content = res.choices[0].message.content
+            if isinstance(content, str):
+                content = content.strip()
+                return None if not content or content.lower() == "null" else content
+            return None
         except Exception as e:
-            log.error(e)
+            log.error(f"Topic detection failed: {e}")
             return None
 
 
