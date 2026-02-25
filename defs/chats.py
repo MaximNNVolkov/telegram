@@ -7,7 +7,7 @@ from pyrogram.errors import NotAcceptable
 
 import logger
 
-from defs.gigachat_api import giga, HumanMessage, SystemMessage
+from defs.gigachat_api import get_giga_client, HumanMessage, SystemMessage
 from defs.deepseek_api import get_response
 
 from database.defs_base import add_chat_details
@@ -103,6 +103,7 @@ async def get_giga_classified(messages: str) -> str:
     log.info('received text for analysis via Gigachat')
     m = [SystemMessage(content=prompt_classified)]
     m.append(HumanMessage(content='Таблица с сообщениями: ' + messages))
+    giga = get_giga_client()
     answ = giga(messages=m)
     return answ.content
 
@@ -110,9 +111,12 @@ async def get_giga_classified(messages: str) -> str:
 async def get_deepseek_classified(messages: str) -> str:
     log.info('received text for analysis via DeepSeek')
     sys_msg = prompt_classified
-    res = get_response(sys_message=sys_msg, user_message=messages)
-    res.choices[0].message.content
-    return res.choices[0].message.content
+    try:
+        res = get_response(sys_message=sys_msg, user_message=messages)
+        return res.choices[0].message.content
+    except Exception as e:
+        log.warning(f'DeepSeek unavailable, fallback to Gigachat: {e}')
+        return await get_giga_classified(messages)
 
 
 def get_messages_for_save(message):

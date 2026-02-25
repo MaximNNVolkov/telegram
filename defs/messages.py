@@ -1,6 +1,7 @@
 from pyrogram import Client
 from pyrogram.types import Message, InputMediaPhoto, InputMediaVideo
 from pyrogram.raw.functions.messages import GetMessageReactionsList
+from typing import Optional
 
 from telegram_types.base_type import ReactionType, ReactionDetails
 
@@ -180,7 +181,7 @@ class TopicHandler:
 #             return None
 
     @staticmethod
-    def get_message_topic(text: str | None) -> str | None:
+    def get_message_topic(text: Optional[str]) -> Optional[str]:
         """Получает название темы из сообщения."""
         if text is None or not str(text).strip():
             return None

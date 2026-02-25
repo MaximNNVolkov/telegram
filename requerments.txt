@@ -1,5 +1,1 @@
-gigachain == 0.2.16
-pyrotgfork == 2.2.7
-python-decouple == 3.8
-langchain-community == 0.3.16
-langchain-gigachat == 0.3.4
+-r requirements.txt

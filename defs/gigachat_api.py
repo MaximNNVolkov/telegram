@@ -2,15 +2,27 @@ from decouple import config
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_gigachat import GigaChat
 import datetime
+from typing import Optional
 
 
-auth = config('SBER_AUTH')
+_giga: Optional[GigaChat] = None
 
 
-giga = GigaChat(credentials=auth,
-                model='GigaChat',
-                verify_ssl_certs=False
-                )
+def get_giga_client() -> GigaChat:
+    global _giga
+    if _giga is not None:
+        return _giga
+
+    auth = str(config('SBER_AUTH', default='')).strip()
+    if not auth:
+        raise RuntimeError('SBER_AUTH is not set.')
+
+    _giga = GigaChat(
+        credentials=auth,
+        model='GigaChat',
+        verify_ssl_certs=False,
+    )
+    return _giga
 
 role = '''Ты являешь персональным ассистентом Максима Викторовича. Тебе будут приходить сообщения 
 только от одного пользователя. Его зовут Александр, в неформальной беседе можно называть Саша. Когда он обращается 
@@ -25,6 +37,7 @@ role = '''Ты являешь персональным ассистентом М
 start_first_msg = None
 def gigachat_dialog(user_msg:str) -> str:
     global msgs, start_first_msg
+    giga = get_giga_client()
     if start_first_msg:
         print(start_first_msg, datetime.datetime.now() - datetime.timedelta(minutes=10),
               start_first_msg < datetime.datetime.now() - datetime.timedelta(minutes=10))
