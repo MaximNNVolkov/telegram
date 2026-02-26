@@ -28,5 +28,10 @@ bot.add_handler(other_message)
 
 # Запуск клиента
 log.info('Bot started')
-bot.run()
-
+try:
+    bot.run()
+except EOFError:
+    log.error(
+        'Pyrogram requires interactive login (confirmation code). '
+        'Run the bot once in an interactive terminal to authorize the session.'
+    )

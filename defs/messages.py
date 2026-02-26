@@ -19,6 +19,12 @@ log = logger.get_logger(__name__)
 
 
 class MessageFormChannel:
+    @staticmethod
+    def _is_message_from_tracked_source(message: Message, channel_id: int) -> bool:
+        channel = Channels.get_channel_by_user_id(channel_id)
+        if not channel or not channel.sources:
+            return False
+        return message.chat.id in channel.sources
 
     @staticmethod
     async def get_message_from_channel(client: Client, message: Message) -> None:
@@ -35,16 +41,18 @@ class MessageFormChannel:
         category = ChatDetails.get_chat_category_by_id(str(message.chat.id))
         log.info(f'Поступило сообщение из категории {category}')
 
-        if category == 'Новости и политика':
-            res = await GroupHandler.get_messages_group(message, chat_id=str(-1002460211363))
-            log.info(f'Найдены сообщения на эту же тему в истории {res}')
-            if res == 'null':
-                sent_message = await MessageSender.send_message(client=client, chat_id=-1002460211363, message=message)
-                if sent_message:
-                    SaveSentMessageHandler.save_sent_message(sent_message, topic=topic)
-        channels = Channels.get_channel_by_user_id(-1002560213613).sources
-        if message.chat.id in channels:
-            await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
+        try:
+            if category == 'Новости и политика':
+                res = await GroupHandler.get_messages_group(message, chat_id=str(-1002460211363))
+                log.info(f'Найдены сообщения на эту же тему в истории {res}')
+                if res == 'null':
+                    sent_message = await MessageSender.send_message(client=client, chat_id=-1002460211363, message=message)
+                    if sent_message:
+                        SaveSentMessageHandler.save_sent_message(sent_message, topic=topic)
+            if MessageFormChannel._is_message_from_tracked_source(message=message, channel_id=-1002560213613):
+                await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
+        except Exception as e:
+            log.error(f'Failed to process channel message {message.chat.id}:{message.id}. Error: {e}')
         return None
 
     @staticmethod
@@ -63,16 +71,18 @@ class MessageFormChannel:
             category = ChatDetails.get_chat_category_by_id(str(message.chat.id))
             log.info(f'Поступило сообщение из категории {category}')
 
-            if category == 'Новости и политика':
-                res = await GroupHandler.get_messages_group(message, chat_id=str(-1002460211363))
-                log.info(f'Найдены сообщения на эту же тему в истории {res}')
-                if res == 'null':
-                    sent_messages = await MediaGroupSender.send_media(client=client, chat_id=-1002460211363, message=message)
-                    SaveSentMessageHandler.save_sent_message(sent_messages, topic)
+            try:
+                if category == 'Новости и политика':
+                    res = await GroupHandler.get_messages_group(message, chat_id=str(-1002460211363))
+                    log.info(f'Найдены сообщения на эту же тему в истории {res}')
+                    if res == 'null':
+                        sent_messages = await MediaGroupSender.send_media(client=client, chat_id=-1002460211363, message=message)
+                        SaveSentMessageHandler.save_sent_message(sent_messages, topic)
 
-            channels = Channels.get_channel_by_user_id(-1002560213613).sources
-            if message.chat.id in channels:
-                await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
+                if MessageFormChannel._is_message_from_tracked_source(message=message, channel_id=-1002560213613):
+                    await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
+            except Exception as e:
+                log.error(f'Failed to process channel media {message.chat.id}:{message.id}. Error: {e}')
         return None
 
 
