@@ -35,6 +35,8 @@ class MessageFormChannel:
         :return: Сообщение из канала
         """
 
+        log.info(f'get_message_from_channel: chat_id={message.chat.id}, chat_type={message.chat.type}, title={message.chat.title}')
+        
         topic = TopicHandler.get_message_topic(message.text or message.caption)
         MessageSaveHandler.save_message_to_db(message, topic)
 
@@ -53,7 +55,7 @@ class MessageFormChannel:
                 await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
         except Exception as e:
             log.error(f'Failed to process channel message {message.chat.id}:{message.id}. Error: {e}')
-        return None
+        return False  # Останавливаем дальнейшую обработку
 
     @staticmethod
     async def get_media_from_channel(client: Client, message: Message) -> None:
@@ -83,7 +85,7 @@ class MessageFormChannel:
                     await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
             except Exception as e:
                 log.error(f'Failed to process channel media {message.chat.id}:{message.id}. Error: {e}')
-        return None
+        return False  # Останавливаем дальнейшую обработку
 
 
 class MessageSaveHandler:

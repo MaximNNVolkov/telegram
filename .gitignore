@@ -1,6 +1,48 @@
+# IDE/editor
 .idea/
 .gigaide/
-Docs/
+.vscode/
+
+# OS
 .DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtualenv
+venv/
+.venv/
+
+# Env files
 .env
-.gitignore
+
+# Logs
+*.log
+*.log.*
+*.loger
+*.loger.*
+telegram_updates.jsonl
+
+# Databases
+*.db
+*.sqlite3
+
+# Pyrogram session files
+*.session
+*.session-journal
+*.session-shm
+*.session-wal
+
+# App-specific
+.telegram_log_cleanup.lock

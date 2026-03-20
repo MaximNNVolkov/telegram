@@ -17,6 +17,8 @@ get_chat_by_id = MessageHandler(get_chat_link, filters=filters.private &
                                                        filters.regex(pattern=r'^id -?\d+$'))
 search_channels = MessageHandler(channel_search, filters=filters.private &
                                                     filters.regex(pattern=r'^search'))
-parse_media = MessageHandler(MessageFormChannel.get_media_from_channel, filters=filters.channel & filters.media_group)
-parse_messages = MessageHandler(MessageFormChannel.get_message_from_channel, filters=filters.channel)
+_source_chat_filters = filters.channel | filters.group
+parse_media = MessageHandler(MessageFormChannel.get_media_from_channel, filters=_source_chat_filters & filters.media_group)
+parse_messages = MessageHandler(MessageFormChannel.get_message_from_channel, filters=_source_chat_filters)
+# Обработчик для всех остальных сообщений (для диагностики)
 other_message = MessageHandler(raw_messages)
