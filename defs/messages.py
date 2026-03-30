@@ -20,11 +20,36 @@ log = logger.get_logger(__name__)
 
 class MessageFormChannel:
     @staticmethod
-    def _is_message_from_tracked_source(message: Message, channel_id: int) -> bool:
-        channel = Channels.get_channel_by_user_id(channel_id)
-        if not channel or not channel.sources:
-            return False
-        return message.chat.id in channel.sources
+    def _get_target_channels_for_source(message: Message) -> list[Channels]:
+        channels = Channels.get_channels_by_source(source_chat_id=message.chat.id)
+        log.info(
+            f'MessageFormChannel._get_target_channels_for_source('
+            f'chat_id={message.chat.id}, message_id={message.id}) -> '
+            f'{[channel.id for channel in channels]}'
+        )
+        return channels
+
+    @staticmethod
+    async def _process_message_for_tracked_channels(client: Client, message: Message) -> None:
+        target_channels = MessageFormChannel._get_target_channels_for_source(message)
+        if not target_channels:
+            log.info(
+                f'MessageFormChannel._process_message_for_tracked_channels: '
+                f'chat_id={message.chat.id}, message_id={message.id} -> '
+                f'no matching channels found in Channels.sources'
+            )
+            return
+
+        for channel in target_channels:
+            log.info(
+                f'MessageFormChannel._process_message_for_tracked_channels: '
+                f'start processing chat_id={message.chat.id}, message_id={message.id}, '
+                f'target_channel_id={channel.id}'
+            )
+            await ChannelsProcessor(channel_id=channel.id).message_processor(
+                client=client,
+                message=message
+            )
 
     @staticmethod
     async def get_message_from_channel(client: Client, message: Message) -> None:
@@ -51,8 +76,7 @@ class MessageFormChannel:
                     sent_message = await MessageSender.send_message(client=client, chat_id=-1002460211363, message=message)
                     if sent_message:
                         SaveSentMessageHandler.save_sent_message(sent_message, topic=topic)
-            if MessageFormChannel._is_message_from_tracked_source(message=message, channel_id=-1002560213613):
-                await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
+            await MessageFormChannel._process_message_for_tracked_channels(client=client, message=message)
         except Exception as e:
             log.error(f'Failed to process channel message {message.chat.id}:{message.id}. Error: {e}')
         return False  # Останавливаем дальнейшую обработку
@@ -81,8 +105,7 @@ class MessageFormChannel:
                         sent_messages = await MediaGroupSender.send_media(client=client, chat_id=-1002460211363, message=message)
                         SaveSentMessageHandler.save_sent_message(sent_messages, topic)
 
-                if MessageFormChannel._is_message_from_tracked_source(message=message, channel_id=-1002560213613):
-                    await ChannelsProcessor(channel_id=-1002560213613).message_processor(client=client, message=message)
+                await MessageFormChannel._process_message_for_tracked_channels(client=client, message=message)
             except Exception as e:
                 log.error(f'Failed to process channel media {message.chat.id}:{message.id}. Error: {e}')
         return False  # Останавливаем дальнейшую обработку

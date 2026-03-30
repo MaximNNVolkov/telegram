@@ -10,14 +10,19 @@ import logger
 log = logger.get_logger(__name__)
 
 
-# Инициализация клиента
+# Инициализация клиента с прокси
 bot = Client(name=config('LOGIN'),
              api_id=config('API_ID'),
              api_hash=config('API_HASH'),
              phone_number=config('PHONE'),
              parse_mode=ParseMode.MARKDOWN,
              no_updates=False,
-             skip_updates=False) #todo: убрать, если не нужно
+             skip_updates=False,
+             proxy={
+                 "scheme": "http",
+                 "hostname": "127.0.0.1",
+                 "port": 10809,
+             }) #todo: убрать, если не нужно
 
 
 # Обработчики низкого приоритета (группа -1): сохранение всех обновлений

@@ -1,4 +1,6 @@
 import logger as loger
+import json
+from pathlib import Path
 from sqlalchemy import Column, Integer, String, DateTime, Text, JSON
 from sqlalchemy import create_engine, ForeignKey, func, desc
 from sqlalchemy.engine.url import URL
@@ -9,6 +11,8 @@ from datetime import datetime, timedelta
 
 
 log = loger.get_logger(__name__)
+_project_root = Path(__file__).resolve().parents[1]
+_db_path = _project_root / "telegram.db"
 
 
 url_object = URL.create(
@@ -16,7 +20,7 @@ url_object = URL.create(
     username="",
     password="",
     host="",
-    database="telegram.db",
+    database=str(_db_path),
 )
 
 
@@ -218,7 +222,7 @@ class SentMessages(DeclarativeBase):
         two_hours_ago = datetime.now() - timedelta(hours=2)
 
         with db_conn() as session:
-            return (
+            messages = (
                 session.query(cls)
                 .filter(cls.channel_id == user_id)
                 .filter(cls.message_date >= two_hours_ago)  # Фильтр по времени
@@ -226,6 +230,35 @@ class SentMessages(DeclarativeBase):
                 .limit(limit)  # Ограничение на количество сообщений
                 .all()
             )
+            log.info(
+                f'SentMessages.get_latest_sent_messages_by_user(user_id={user_id}, limit={limit}) -> '
+                f'count={len(messages)}, ids={[message.sent_message_id for message in messages[:10]]}'
+            )
+            return messages
+
+    @classmethod
+    def get_sent_messages_by_user(cls, user_id: str, limit: int = None):
+        """
+        Получает отправленные сообщения конкретного канала без ограничения по времени.
+
+        :param user_id: Идентификатор канала
+        :param limit: Необязательное ограничение количества сообщений
+        :return: Список сообщений
+        """
+        with db_conn() as session:
+            query = (
+                session.query(cls)
+                .filter(cls.channel_id == user_id)
+                .order_by(desc(cls.message_date))
+            )
+            if limit is not None:
+                query = query.limit(limit)
+            messages = query.all()
+            log.info(
+                f'SentMessages.get_sent_messages_by_user(user_id={user_id}, limit={limit}) -> '
+                f'count={len(messages)}, ids={[message.sent_message_id for message in messages[:10]]}'
+            )
+            return messages
 
 
 class Channels(DeclarativeBase):
@@ -240,6 +273,17 @@ class Channels(DeclarativeBase):
     id = Column(Integer, primary_key=True)
     keywords = Column(JSON)  # Список ключевых слов
     sources = Column(JSON)  # Список источников (ID телеграм-каналов)
+
+    @staticmethod
+    def _normalize_json_field(value):
+        if value is None:
+            return None
+        if isinstance(value, str):
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                return value
+        return value
 
 
     # Метод для добавления нового канала
@@ -286,7 +330,15 @@ class Channels(DeclarativeBase):
 
         try:
             with db_conn() as session:
-                return session.query(cls).filter(cls.id == channel_id).first()
+                channel = session.query(cls).filter(cls.id == channel_id).first()
+                if channel:
+                    channel.keywords = cls._normalize_json_field(channel.keywords)
+                    channel.sources = cls._normalize_json_field(channel.sources)
+                log.info(
+                    f'Channels.get_channel_by_user_id(channel_id={channel_id}) -> '
+                    f'{channel.id if channel else None}'
+                )
+                return channel
         except SQLAlchemyError as e:
             # Обработка ошибок при запросе к базе данных
             log.info(f"SQLAlchemyError: {e}")
@@ -303,10 +355,39 @@ class Channels(DeclarativeBase):
         try:
             with db_conn() as session:
                 channel = session.query(cls).filter(cls.id == channel_id).first()
-                return channel.keywords
+                keywords = cls._normalize_json_field(channel.keywords) if channel else None
+                log.info(f'Channels.get_channel_keywords(channel_id={channel_id}) -> {keywords}')
+                return keywords
         except SQLAlchemyError as e:
             # Обработка ошибок при запросе к базе данных
             log.info(f"SQLAlchemyError: {e}")
+
+    @classmethod
+    def get_channels_by_source(cls, source_chat_id: int):
+        """
+        Возвращает каналы, в которых source_chat_id присутствует в поле sources.
+
+        :param source_chat_id: ID исходного чата/группы
+        :return: Список каналов
+        """
+        try:
+            with db_conn() as session:
+                channels = session.query(cls).all()
+                matched_channels = []
+                for channel in channels:
+                    normalized_sources = cls._normalize_json_field(channel.sources) or []
+                    if source_chat_id in normalized_sources:
+                        channel.sources = normalized_sources
+                        channel.keywords = cls._normalize_json_field(channel.keywords)
+                        matched_channels.append(channel)
+                log.info(
+                    f'Channels.get_channels_by_source(source_chat_id={source_chat_id}) -> '
+                    f'{[channel.id for channel in matched_channels]}'
+                )
+                return matched_channels
+        except SQLAlchemyError as e:
+            log.info(f"SQLAlchemyError: {e}")
+            return []
 
 
 def db_conn():

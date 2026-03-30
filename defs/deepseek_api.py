@@ -20,17 +20,6 @@ def _build_client():
     return OpenAI(api_key=api_key, base_url='https://api.deepseek.com')
 
 
-# def get_response(user_message: str, sys_message: str = ''):
-#     response = client.chat.completions.create(
-#         model="deepseek-chat",
-#         messages=[
-#             {"role": "system", "content": sys_message},
-#             {"role": "user", "content": user_message}
-#                 ],
-#     stream=False
-#     )
-#     return response
-
 def get_response(user_message: Optional[str], sys_message: Optional[str] = ''):
     user_content = '' if user_message is None else str(user_message)
     sys_content = '' if sys_message is None else str(sys_message)

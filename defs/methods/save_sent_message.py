@@ -1,5 +1,9 @@
 from pyrogram.types import Message
 from database.db_start import SentMessages
+import logger
+
+
+log = logger.get_logger(__name__)
 
 
 class SaveSentMessageHandler:
@@ -23,4 +27,8 @@ class SaveSentMessageHandler:
                          message_text = message.caption or message.text,
                          message_topic = topic or '',
                          message_date = message.date))
+        log.info(
+            f'SaveSentMessageHandler.save_sent_message('
+            f'channel_id={message.chat.id}, sent_message_id={message.id}, topic={topic}) -> {res}'
+        )
         return res

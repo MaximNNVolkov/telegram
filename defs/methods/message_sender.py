@@ -21,6 +21,11 @@ class MessageSender:
 
         message_text = message.text if message.text else message.caption
         message_blocked_type = Filters(text=message_text).apply_filters()
+        log.info(
+            f'MessageSender.send_message('
+            f'source_chat_id={message.chat.id}, source_message_id={message.id}, '
+            f'target_chat_id={chat_id}) filter_result={message_blocked_type}'
+        )
         if message_blocked_type != MessageBlockType.NORMAL:
             log.warning(f"""filtered message: {message.chat.id}, {message.id} is blocked\
                  message blocked type: {message_blocked_type}.""")
@@ -34,5 +39,9 @@ class MessageSender:
             for i in range(1024, len(caption), 1024):
                 if i<len(caption):
                     res = await client.send_message(chat_id=chat_id, text=caption[i:i+1024])
-        log.info(f'message sent to chat result: {res.id}')
+        log.info(
+            f'MessageSender.send_message('
+            f'source_chat_id={message.chat.id}, source_message_id={message.id}, '
+            f'target_chat_id={chat_id}) -> sent_message_id={res.id}'
+        )
         return res
