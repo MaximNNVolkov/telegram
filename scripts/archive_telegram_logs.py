@@ -30,7 +30,7 @@ def main() -> int:
         print(f'No log file found: {LOG_PATH}')
         return 0
 
-    cutoff = datetime.now() - timedelta(days=7)
+    cutoff = datetime.utcnow() - timedelta(days=7)
 
     LOCK_PATH.parent.mkdir(parents=True, exist_ok=True)
     with LOCK_PATH.open('w', encoding='utf-8') as lock_file:

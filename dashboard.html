@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>News Aggregator Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+         background: #0d1117; color: #c9d1d9; padding: 20px; }
+  h1 { color: #58a6ff; font-size: 1.5rem; margin-bottom: 20px; }
+  h2 { color: #8b949e; font-size: 1rem; margin: 20px 0 10px; text-transform: uppercase; letter-spacing: .05em; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+  .card .value { font-size: 2rem; font-weight: 700; color: #f0f6fc; }
+  .card .label { font-size: .8rem; color: #8b949e; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #21262d; }
+  th { color: #8b949e; font-weight: 500; }
+  .bar-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: .8rem; }
+  .bar-label { width: 50px; color: #8b949e; text-align: right; flex-shrink: 0; }
+  .bar-container { display: flex; gap: 2px; flex-grow: 1; }
+  .bar { height: 20px; border-radius: 3px; display: flex; align-items: center; padding-left: 6px;
+         font-size: .7rem; color: #fff; min-width: 2px; overflow: hidden; }
+  .bar-recv { background: #1f6feb; }
+  .bar-sent { background: #238636; }
+  .legend { display: flex; gap: 20px; margin: 10px 0; font-size: .85rem; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+  .update-time { color: #484f58; font-size: .75rem; margin-top: 20px; text-align: right; }
+</style>
+</head>
+<body>
+<h1>📊 News Aggregator &mdash; @anonim_cod</h1>
+
+<div class="grid">
+  <div class="card"><div class="value">123,422</div><div class="label">Всего получено</div></div>
+  <div class="card"><div class="value">26,948</div><div class="label">Всего отправлено</div></div>
+  <div class="card"><div class="value">0</div><div class="label">Получено за час</div></div>
+  <div class="card"><div class="value">0</div><div class="label">Отправлено за час</div></div>
+  <div class="card"><div class="value">54</div><div class="label">Каналов в БД</div></div>
+  <div class="card"><div class="value">2</div><div class="label">Целевых каналов</div></div>
+</div>
+
+<h2>⏱ Почасовая активность (24ч)</h2>
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#1f6feb"></div> Получено</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#238636"></div> Отправлено</div>
+</div>
+<div class="card" style="padding:12px">
+<div class='bar-row'><span class='bar-label'>08:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>09:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>10:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>11:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>12:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>13:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>14:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>15:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>16:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>17:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>18:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>19:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>20:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>21:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>22:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>23:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>00:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>01:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>02:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>03:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>04:13</span><div class='bar-container'><div class='bar bar-recv' style='width:6px'>2</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>05:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>06:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div><div class='bar-row'><span class='bar-label'>07:13</span><div class='bar-container'><div class='bar bar-recv' style='width:2px'>0</div><div class='bar bar-sent' style='width:2px'>0</div></div></div>
+</div>
+
+<h2>🔥 Топ каналов за сутки</h2>
+<table>
+  <tr><th>Chat ID</th><th>Название</th><th>Сообщений</th></tr>
+  <tr><td>-1001203560567</td><td>MarketTwits</td><td>2</td></tr>
+</table>
+
+<h2>📰 Последние новости в AI новости</h2>
+<table>
+  <tr><th>Время</th><th>Текст</th></tr>
+  <tr><td colspan='2'>Нет новостей за час</td></tr>
+</table>
+
+<div class="update-time">Обновлено: 2026-05-29 08:13:27</div>
+</body>
+</html>

@@ -3,15 +3,12 @@ from pathlib import Path
 
 
 _log_format = f"%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
-_project_root = Path(__file__).resolve().parent
-_log_file = _project_root / "telegram.loger"
 
 
 def get_file_handler(level):
-    file_handler = logging.FileHandler(_log_file)
-    file_handler.setLevel(level)
-    file_handler.setFormatter(logging.Formatter(_log_format))
-    return file_handler
+    """Legacy — не используется, оставлено для совместимости.
+    Все логи пишутся в journald через stdout."""
+    return None
 
 
 def get_stream_handler(level):
@@ -29,6 +26,5 @@ def get_logger(name):
     level = logging.DEBUG
     logger.setLevel(level)
     logger.propagate = False
-    logger.addHandler(get_file_handler(level))
     logger.addHandler(get_stream_handler(level))
     return logger

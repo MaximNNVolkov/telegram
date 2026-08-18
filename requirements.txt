@@ -2,6 +2,6 @@ gigachain==0.2.16
 pyrotgfork==2.2.7
 TgCrypto==1.2.5
 python-decouple==3.8
-langchain-community==0.3.16
+langchain-community==0.3.24
 langchain-gigachat==0.3.4
 openai>=1.0.0,<2.0.0

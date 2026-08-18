@@ -31,7 +31,7 @@ DeclarativeBase = declarative_base()
 class Users(DeclarativeBase):
     __tablename__ = 'users'
 
-    date = Column(DateTime(), default=datetime.now)
+    date = Column(DateTime(), default=datetime.utcnow)
     user_id = Column('user_id', Integer, primary_key=True)
     first_name = Column('first_name', String)
     last_name = Column('last_name', String)
@@ -85,7 +85,7 @@ class Users(DeclarativeBase):
 class ChatDetails(DeclarativeBase):
     __tablename__ = 'chatdetails'
 
-    date = Column(DateTime(), default=datetime.now)
+    date = Column(DateTime(), default=datetime.utcnow)
     id = Column(String, primary_key=True)
     type = Column(String)
     title = Column(String)
@@ -112,7 +112,7 @@ class ChatDetails(DeclarativeBase):
 class Messages(DeclarativeBase):
     __tablename__ = 'messages'
 
-    date = Column(DateTime(), default=datetime.now)
+    date = Column(DateTime(), default=datetime.utcnow)
     chat_id = Column(String, ForeignKey('chatdetails.id'), primary_key=True)
     message_id = Column(Integer, primary_key=True)
     message_type = Column(String)
@@ -183,7 +183,7 @@ class Messages(DeclarativeBase):
 class SentMessages(DeclarativeBase):
     __tablename__ = 'sent_messages'
 
-    date = Column(DateTime(), default=datetime.now)
+    date = Column(DateTime(), default=datetime.utcnow)
     channel_id = Column(String, ForeignKey('chatdetails.id'), primary_key=True)  # Идентификатор канала в который
     sent_message_id = Column(Integer, primary_key=True)  # Идентификатор отправленного сообщения
     message_type = Column(String)
@@ -219,13 +219,13 @@ class SentMessages(DeclarativeBase):
         :param limit: Количество сообщений (по умолчанию 30)
         :return: Список сообщений
         """
-        two_hours_ago = datetime.now() - timedelta(hours=2)
+        two_hours_ago = datetime.utcnow() - timedelta(hours=2)
 
         with db_conn() as session:
             messages = (
                 session.query(cls)
                 .filter(cls.channel_id == user_id)
-                .filter(cls.message_date >= two_hours_ago)  # Фильтр по времени
+                .filter(cls.message_date >= two_hours_ago)  # Фильтр по времени (UTC)
                 .order_by(desc(cls.message_date))
                 .limit(limit)  # Ограничение на количество сообщений
                 .all()
@@ -269,7 +269,7 @@ class Channels(DeclarativeBase):
 
     __tablename__ = 'channels'
 
-    date = Column(DateTime(), default=datetime.now)
+    date = Column(DateTime(), default=datetime.utcnow)
     id = Column(Integer, primary_key=True)
     keywords = Column(JSON)  # Список ключевых слов
     sources = Column(JSON)  # Список источников (ID телеграм-каналов)

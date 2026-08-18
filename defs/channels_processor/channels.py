@@ -144,14 +144,22 @@ class DuplicateMessageChecker:
         if content.lower() == 'null':
             return []
 
+        decoder = json.JSONDecoder()
         try:
-            parsed = json.loads(content)
+            parsed, end_index = decoder.raw_decode(content)
         except json.JSONDecodeError:
             log.warning(
                 f'DuplicateMessageChecker._normalize_duplicate_response failed to parse JSON: '
                 f'raw_response={raw_response}'
             )
             return None
+
+        trailing_content = content[end_index:].strip()
+        if trailing_content:
+            log.warning(
+                'DuplicateMessageChecker._normalize_duplicate_response ignored trailing '
+                f'non-JSON content: trailing_content={trailing_content}'
+            )
 
         if parsed is None:
             return []
@@ -166,7 +174,7 @@ class DuplicateMessageChecker:
 
     def find_duplicate_sent_messages(self) -> Optional[list]:
         history_messages = SentMessages.get_sent_messages_by_user(
-            user_id=str(self.target_channel_id)
+            user_id=str(self.target_channel_id), limit=50
         )
         log.info(
             f'DuplicateMessageChecker.find_duplicate_sent_messages history: '
@@ -260,8 +268,8 @@ class MatchKeyWords:
 
     def response_match(self) -> str:
         if not self.keywords:
-            log.info("MatchKeyWords.response_match -> Нет (keywords are empty or missing)")
-            return "Нет"
+            log.info("MatchKeyWords.response_match -> Да (no keywords filter — all messages pass)")
+            return "Да"
         try:
             api_response = get_response(
                 user_message=self.prompt

@@ -65,17 +65,7 @@ class MessageFormChannel:
         topic = TopicHandler.get_message_topic(message.text or message.caption)
         MessageSaveHandler.save_message_to_db(message, topic)
 
-        category = ChatDetails.get_chat_category_by_id(str(message.chat.id))
-        log.info(f'Поступило сообщение из категории {category}')
-
         try:
-            if category == 'Новости и политика':
-                res = await GroupHandler.get_messages_group(message, chat_id=str(-1002460211363))
-                log.info(f'Найдены сообщения на эту же тему в истории {res}')
-                if res == 'null':
-                    sent_message = await MessageSender.send_message(client=client, chat_id=-1002460211363, message=message)
-                    if sent_message:
-                        SaveSentMessageHandler.save_sent_message(sent_message, topic=topic)
             await MessageFormChannel._process_message_for_tracked_channels(client=client, message=message)
         except Exception as e:
             log.error(f'Failed to process channel message {message.chat.id}:{message.id}. Error: {e}')
@@ -90,21 +80,13 @@ class MessageFormChannel:
         :return: Сообщение из канала
         """
 
+        log.info(f'get_media_from_channel: chat_id={message.chat.id}, chat_type={message.chat.type}, title={message.chat.title}')
+
         if message.caption:
             topic = TopicHandler.get_message_topic(message.caption)
             MessageSaveHandler.save_message_to_db(message, topic)
 
-            category = ChatDetails.get_chat_category_by_id(str(message.chat.id))
-            log.info(f'Поступило сообщение из категории {category}')
-
             try:
-                if category == 'Новости и политика':
-                    res = await GroupHandler.get_messages_group(message, chat_id=str(-1002460211363))
-                    log.info(f'Найдены сообщения на эту же тему в истории {res}')
-                    if res == 'null':
-                        sent_messages = await MediaGroupSender.send_media(client=client, chat_id=-1002460211363, message=message)
-                        SaveSentMessageHandler.save_sent_message(sent_messages, topic)
-
                 await MessageFormChannel._process_message_for_tracked_channels(client=client, message=message)
             except Exception as e:
                 log.error(f'Failed to process channel media {message.chat.id}:{message.id}. Error: {e}')
@@ -247,6 +229,8 @@ class GroupHandler:
         :param chat_id: ID группы или канала из которого нужно получить историю сообщений.
         :return: Сообщения из группы или канала
         """
+
+        
 
         # Формируем системный prompt с инструкцией
         sys_prompt = """сравни семантическое содержание текущего сообщения с историей сообщений из новостных каналов.

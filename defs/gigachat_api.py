@@ -39,15 +39,15 @@ def gigachat_dialog(user_msg:str) -> str:
     global msgs, start_first_msg
     giga = get_giga_client()
     if start_first_msg:
-        print(start_first_msg, datetime.datetime.now() - datetime.timedelta(minutes=10),
-              start_first_msg < datetime.datetime.now() - datetime.timedelta(minutes=10))
-        if start_first_msg < datetime.datetime.now() - datetime.timedelta(minutes=10):
+        print(start_first_msg, datetime.datetime.utcnow() - datetime.timedelta(minutes=10),
+              start_first_msg < datetime.datetime.utcnow() - datetime.timedelta(minutes=10))
+        if start_first_msg < datetime.datetime.utcnow() - datetime.timedelta(minutes=10):
             msgs = [SystemMessage(content=role)]
     else:
-        start_first_msg = datetime.datetime.now()
+        start_first_msg = datetime.datetime.utcnow()
         msgs = [SystemMessage(content=role)]
     print(start_first_msg, user_msg)
-    start_first_msg = datetime.datetime.now()
+    start_first_msg = datetime.datetime.utcnow()
     msgs.append(HumanMessage(content=user_msg))
     answer = giga(msgs)
     msgs.append(answer)
